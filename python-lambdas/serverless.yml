@@ -1,0 +1,50 @@
+service: api-usuarios-serverless
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  stage: prod
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}-usuarios
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  crearUsuario:
+    handler: usuarios_handler.crear
+    events:
+      - httpApi:
+          path: /usuarios
+          method: post
+
+  obtenerUsuario:
+    handler: usuarios_handler.obtener
+    events:
+      - httpApi:
+          path: /usuarios/{id}
+          method: get
+
+resources:
+  Resources:
+    UsuariosDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}

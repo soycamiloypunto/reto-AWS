@@ -1,0 +1,46 @@
+# =========================
+# Backend Java (Spring Boot)
+# =========================
+api-personas/target/
+api-personas/.mvn/wrapper/maven-wrapper.jar
+api-personas/!**/src/main/**/target/
+api-personas/!**/src/test/**/target/
+api-personas/*.log
+api-personas/.idea/
+api-personas/*.iml
+api-personas/.vscode/
+
+# =========================
+# Serverless Framework & Python
+# =========================
+python-lambdas/.serverless/
+python-lambdas/__pycache__/
+python-lambdas/*.pyc
+python-lambdas/.pytest_cache/
+python-lambdas/venv/
+python-lambdas/env/
+
+# =========================
+# Terraform
+# =========================
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/crash.log
+terraform/*.tfvars
+terraform/*.tfvars.json
+terraform/override.tf
+terraform/override.tf.json
+terraform/*_override.tf
+terraform/*_override.tf.json
+
+# =========================
+# Mac OS / Generales
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+terraform/terraform

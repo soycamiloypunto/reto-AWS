@@ -1,0 +1,65 @@
+--- Shared Strings found in Excel ---
+ 
+tiempo en dias
+# HU
+Historia de Usuario
+Criterios de aceptacion
+Integrar sonarlint en el back
+1. Construir un api con 2 endpoint, guardarpersona y consultarpersona, de cada persona se desea saber(# de identificacion, nombre y email)
+Aprovisionar la base de datos relacional con RDS
+1. la base de datos sera accesible por cualquier persona en cualquier parte del mundo
+2. se creara un usuario y un esquema dentro de la base de datos para el microservicio
+3. los endpoint creados en la HU1 deben persistir esta basedatos.
+
+desplegar el api
+1. configurar dockerfile del api para poder crear la img de docker
+2. publicar la img de docker en el ECR
+3. aprovicionar el ECS
+4. desplegar la img del api que esta en ECR en el ECS aprovicionado
+5. configurar los 2 endpoint en el apigateway
+6. validar que los endpoint del api desplegada persistan adecuadamente el RDS
+7. Utilizar balanceador de carga
+Agregarle autenticación al sistema
+1. configurar cognito como servicio para autenticarse en el sistema
+2. integrar api-gateway con cognito para que no se puedan acceder a los endpoint sin token
+3. validar que no se puedan consumir los endpoint sin token valido
+
+NOTA: Cuidado con crear el grupo de usuario con conexion maquina a maquina, su costo es elevado
+Utilizar variables de entorno en el sistema
+1. utilizar parameter store y systen manager como bodega de variables de entorno (por ejemplo: url_base_datos, usuario_bd)
+2. integrar el ECS con el parameter store y secret manager para que le provea variables al api desplegado en ECS
+3. actualizar el proyecto para que no use variables quemadas y utilice las que les provee el parameter store y secret manager.
+3. volver a validar funcionamiento correcto del api como la persistencia al rds
+Logs y trazas en el api principal
+- generar 2 alertas como minimo en cloudwatch
+- validar que se disparen adecuadamente
+lambda api usuarios  (framework serverless)
+1. usar serverless framework 
+link
+
+2, crear 1 endpoint de cada uno (GET, POST, PUT, DELETE) de usuarios con columnas (id, nombre, email) 2 en cada tecnologia (java, nodejs) para ser deplegado con framework severless
+3. el serverless debe incluir (1 solo api gateway para los 4 endpoints, 4 
+lambdas
+)
+4. el api por ahora regresara unos usuarios en memoria(quemados)
+Aprovisionar la base de datos dynamoDB (usuarios)
+1. la base de datos sera accesible por cualquier persona en cualquier parte del mundo
+2. la dynamoDB tendra las siguientes columnas (id, nombre, email)
+3. dentro del api en cada uno de los servicios se incluira la conexión con dynamoDB
+4. configurar la dynamo para que este privada y solo se pueda acceder a traves de las 4 lambdas
+Envio de mensajes encolados por correo.
+1. configurar un SQS para que solo pueda recibir eventos desde el lambda de crearUsuario
+2. el lambda de crearUsuario debe enviar un mensaje al SQS con la informacion del usuario creado.
+3. crear lambda de enviarCorreos por SNS y que se dispare con los eventos del SQS.
+4. configurar el SQS para que solo sea accedido desde las 2 lambdas y el SNS para que solo sea accedido desde el lambda enviarCorreos
+5. Validar accesos.
+azure devops, pipeline
+- entender bien el concepto devops
+- entender que pasos tiene un pipeline
+- ponernos como responsables de una hu en azure devops (saber como mapear una historia de usuario)
+Kubernetes - minikube
+- entender bien el concepto
+- pods, service, configmap, secret, ingress
+- como ver los logs de kubernetes
+cloudformation sin serverless
+- hacer la IAC  de las hu 7,8 y 9 
