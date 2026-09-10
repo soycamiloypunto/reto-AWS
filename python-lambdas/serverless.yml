@@ -14,12 +14,8 @@ provider:
       statements:
         - Effect: Allow
           Action:
-            - dynamodb:Query
-            - dynamodb:Scan
             - dynamodb:GetItem
             - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
           Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
         - Effect: Allow
           Action:
