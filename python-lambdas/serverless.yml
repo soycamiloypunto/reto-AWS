@@ -7,6 +7,8 @@ provider:
   stage: prod
   environment:
     DYNAMODB_TABLE: ${self:service}-${self:provider.stage}-usuarios
+    SQS_QUEUE_URL: { Ref: UsuariosQueue }
+    SNS_TOPIC_ARN: { Ref: UsuariosTopic }
   iam:
     role:
       statements:
@@ -19,6 +21,16 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+          Resource:
+            Fn::GetAtt: [UsuariosQueue, Arn]
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource:
+            Ref: UsuariosTopic
 
 functions:
   crearUsuario:
@@ -35,6 +47,14 @@ functions:
           path: /usuarios/{id}
           method: get
 
+  enviarCorreos:
+    handler: notificaciones_handler.procesar
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [UsuariosQueue, Arn]
+          batchSize: 1
+
 resources:
   Resources:
     UsuariosDynamoDBTable:
@@ -48,3 +68,13 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        
+    UsuariosQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:service}-${self:provider.stage}-queue
+        
+    UsuariosTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:service}-${self:provider.stage}-topic

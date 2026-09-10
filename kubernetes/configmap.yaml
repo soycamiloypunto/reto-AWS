@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-personas-config
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  # URL de conexión (conectado a base de datos creado en Fase 1)
+  SPRING_R2DBC_URL: "r2dbc:postgresql://host.docker.internal:5432/apipersonas_db"

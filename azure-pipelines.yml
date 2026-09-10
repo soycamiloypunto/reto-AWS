@@ -1,0 +1,48 @@
+trigger:
+  - main # El pipeline se lanza automáticamente al hacer push a la rama main
+
+pool:
+  vmImage: 'ubuntu-latest' # Usa un agente Linux en la nube
+
+stages:
+- stage: Construccion_y_Pruebas
+  jobs:
+  - job: Compilar_Java
+    steps:
+    - task: Maven@4
+      inputs:
+        mavenPomFile: 'api-personas/pom.xml'
+        goals: 'clean package'
+        options: '-DskipTests=false'
+      displayName: 'Ejecutar Pruebas y Compilar Java'
+
+- stage: Despliegue_Infraestructura
+  dependsOn: Construccion_y_Pruebas
+  jobs:
+  - job: Terraform_Apply
+    steps:
+    - script: |
+        cd terraform
+        terraform init
+        terraform apply -auto-approve
+      displayName: 'Aprovisionar con Terraform'
+      env:
+        AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+        AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+
+- stage: Despliegue_Serverless
+  dependsOn: Despliegue_Infraestructura
+  jobs:
+  - job: Serverless_Deploy
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+    - script: |
+        npm install -g serverless
+        cd python-lambdas
+        serverless deploy
+      displayName: 'Desplegar funciones Lambda y DynamoDB'
+      env:
+        AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+        AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)

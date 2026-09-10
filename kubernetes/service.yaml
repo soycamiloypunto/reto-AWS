@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-personas-service
+spec:
+  # LoadBalancer expone el puerto 80 localmente para consumirlo
+  type: LoadBalancer
+  selector:
+    app: api-personas # Este label conecta el Service con el Deployment
+  ports:
+    - protocol: TCP
+      port: 80 # El puerto público
+      targetPort: 8080 # El puerto interno de Spring Boot

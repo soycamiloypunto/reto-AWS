@@ -3,9 +3,12 @@ import os
 import boto3
 import uuid
 
-# Cliente de DynamoDB
+# Cliente de DynamoDB y SQS
 dynamodb = boto3.resource('dynamodb')
+sqs = boto3.client('sqs')
+
 table_name = os.environ.get('DYNAMODB_TABLE', 'api-usuarios-serverless-prod-usuarios')
+queue_url = os.environ.get('SQS_QUEUE_URL')
 table = dynamodb.Table(table_name)
 
 def build_response(status_code, body):
@@ -36,6 +39,18 @@ def crear(event, context):
         
         # Guardar en DynamoDB
         table.put_item(Item=item)
+        
+        # Enviar mensaje a SQS
+        if queue_url:
+            mensaje = {
+                "evento": "USUARIO_CREADO",
+                "usuario": item
+            }
+            sqs.send_message(
+                QueueUrl=queue_url,
+                MessageBody=json.dumps(mensaje)
+            )
+            print(f"Mensaje enviado a SQS: {mensaje}")
         
         return build_response(201, {"message": "Usuario creado con éxito", "id": usuario_id})
         

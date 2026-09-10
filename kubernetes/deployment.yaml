@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-personas-deployment
+spec:
+  replicas: 2 # Levantaremos 2 copias (Pods) para alta disponibilidad
+  selector:
+    matchLabels:
+      app: api-personas
+  template:
+    metadata:
+      labels:
+        app: api-personas
+    spec:
+      containers:
+        - name: api-personas-container
+          # Uso tu imagen de Docker ('api-personas-repo:latest')
+          image: api-personas-repo:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: api-personas-config
+            - secretRef:
+                name: api-personas-secret
